@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "bistro-boss-4c0b8"
-  }
+    "default": "bistro-boss-e3f5a",
+    "dev": "bistro-boss-e3f5a"
+  },
+  "targets": {},
+  "etags": {}
 }

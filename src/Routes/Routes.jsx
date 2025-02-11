@@ -20,12 +20,14 @@ import Payment from "../pages/Dashboard/Payment/Payment";
 import PaymentHistory from "../pages/Dashboard/PaymentHistory/PaymentHistory";
 import UserHome from "../pages/Dashboard/UserHome/UserHome";
 import AdminHome from "../pages/Dashboard/AdminHome/AdminHome";
+import NotFoundPage from "../pages/NotFoundPage";
 
 
   export const router = createBrowserRouter([
     {
       path: "/",
       element: <Main></Main>,
+      errorElement:<NotFoundPage></NotFoundPage>,
       children: [
         {
             path: '/',
@@ -91,7 +93,7 @@ import AdminHome from "../pages/Dashboard/AdminHome/AdminHome";
         {
           path: 'updateItem/:id',
           element: <AdminRoute><UpdateItem></UpdateItem></AdminRoute>,
-          loader: ({params}) => fetch(`https://bistro-boss-server-seven-sage.vercel.app/menu/${params.id}`)
+          loader: ({params}) => fetch(`https://bistro-server-rust.vercel.app/menu/${params.id}`)
         },
         {
           path: 'users',

@@ -3,8 +3,10 @@ import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-s
 import { AuthContext } from '../../providers/AuthProvider';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 import SocialLogin from '../../components/SocialLogin/SocialLogin';
+import { FaEnvelope, FaLock, FaKey } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const Login = () => {
     const [disabled, setDisabled] = useState(true);
@@ -13,11 +15,11 @@ const Login = () => {
     const location = useLocation();
 
     const from = location.state?.from?.pathname || "/";
-    console.log('state in the location login page', location.state)
+    console.log('state in the location login page', location.state);
 
     useEffect(() => {
         loadCaptchaEnginge(6);
-    }, [])
+    }, []);
 
     const handleLogin = event => {
         event.preventDefault();
@@ -39,43 +41,47 @@ const Login = () => {
                     }
                 });
                 navigate(from, { replace: true });
-            })
-    }
+            });
+    };
 
     const handleValidateCaptcha = (e) => {
         const user_captcha_value = e.target.value;
         if (validateCaptcha(user_captcha_value)) {
             setDisabled(false);
+        } else {
+            setDisabled(true);
         }
-        else {
-            setDisabled(true)
-        }
-    }
+    };
 
     return (
         <>
             <Helmet>
-                <title>Bistro Boss | Login</title>
+                <title>Culinary Crave | Login</title>
             </Helmet>
-            <div className="hero min-h-screen bg-base-200">
+            <div className="hero min-h-screen bg-gradient-to-r from-blue-500 to-purple-600">
                 <div className="hero-content flex-col md:flex-row-reverse">
-                    <div className="text-center md:w-1/2 lg:text-left">
-                        <h1 className="text-5xl font-bold">Login now!</h1>
-                        <p className="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
-                    </div>
-                    <div className="card md:w-1/2 max-w-sm shadow-2xl bg-base-100">
-                        <form onSubmit={handleLogin} className="card-body">
+                    <motion.div 
+                        className="text-center md:w-1/2 lg:text-left"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        <h1 className="text-5xl font-extrabold text-white">Login Now!</h1>
+                        <p className="py-6 text-white opacity-80">Log in to explore delicious foods and great offers. Get started now!</p>
+                    </motion.div>
+                    <div className="card md:w-1/2 max-w-sm shadow-2xl bg-base-100 rounded-lg">
+                        <form onSubmit={handleLogin} className="card-body space-y-6">
                             <div className="form-control">
                                 <label className="label">
-                                    <span className="label-text">Email</span>
+                                    <span className="label-text"><FaEnvelope className="mr-2" /> Email</span>
                                 </label>
-                                <input type="email" name="email" placeholder="email" className="input input-bordered" />
+                                <input type="email" name="email" placeholder="Email" className="input input-bordered" />
                             </div>
                             <div className="form-control">
                                 <label className="label">
-                                    <span className="label-text">Password</span>
+                                    <span className="label-text"><FaLock className="mr-2" /> Password</span>
                                 </label>
-                                <input type="password" name="password" placeholder="password" className="input input-bordered" />
+                                <input type="password" name="password" placeholder="Password" className="input input-bordered" />
                                 <label className="label">
                                     <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                                 </label>
@@ -84,16 +90,31 @@ const Login = () => {
                                 <label className="label">
                                     <LoadCanvasTemplate />
                                 </label>
-                                <input onBlur={handleValidateCaptcha} type="text" name="captcha" placeholder="type the captcha above" className="input input-bordered" />
-
+                                <div className="flex items-center justify-between">
+                                    <input onBlur={handleValidateCaptcha} type="text" name="captcha" placeholder="Type the captcha above" className="input input-bordered w-3/4" />
+                                    <motion.button
+                                        type="submit"
+                                        className="btn btn-primary w-1/4"
+                                        disabled={disabled}
+                                        whileHover={{ scale: 1.05 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <FaKey />
+                                    </motion.button>
+                                </div>
                             </div>
                             <div className="form-control mt-6">
-                                {/* TODO: apply disabled for re captcha */}
-                                <input disabled={false} className="btn btn-primary" type="submit" value="Login" />
+                                <motion.input
+                                    className="btn btn-primary"
+                                    type="submit"
+                                    value="Login"
+                                    whileHover={{ scale: 1.05 }}
+                                    transition={{ duration: 0.3 }}
+                                />
                             </div>
                         </form>
-                        <p className='px-6'><small>New Here? <Link to="/signup">Create an account</Link> </small></p>
-                        <SocialLogin></SocialLogin>
+                        <p className="px-6"><small>New here? <Link to="/signup" className="text-blue-500">Create an account</Link></small></p>
+                        <SocialLogin />
                     </div>
                 </div>
             </div>

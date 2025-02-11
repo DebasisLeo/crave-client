@@ -1,122 +1,179 @@
 import { useLoaderData } from "react-router-dom";
-import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
 import Swal from "sweetalert2";
 import useAxiosPublic from "../../../hooks/useAxiosPublic";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { FaUtensils, FaUpload, FaSave } from "react-icons/fa";
 
 const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 
 const UpdateItem = () => {
-    const {name, category, recipe, price, _id} = useLoaderData();
-
+    const { name, category, recipe, price, _id } = useLoaderData();
     const { register, handleSubmit } = useForm();
     const axiosPublic = useAxiosPublic();
     const axiosSecure = useAxiosSecure();
+
     const onSubmit = async (data) => {
-        console.log(data)
-        // image upload to imgbb and then get an url
-        const imageFile = { image: data.image[0] }
+        const imageFile = { image: data.image[0] };
         const res = await axiosPublic.post(image_hosting_api, imageFile, {
-            headers: {
-                'content-type': 'multipart/form-data'
-            }
+            headers: { "content-type": "multipart/form-data" }
         });
+
         if (res.data.success) {
-            // now send the menu item data to the server with the image url
             const menuItem = {
                 name: data.name,
                 category: data.category,
                 price: parseFloat(data.price),
                 recipe: data.recipe,
                 image: res.data.data.display_url
-            }
-            // 
+            };
+
             const menuRes = await axiosSecure.patch(`/menu/${_id}`, menuItem);
-            console.log(menuRes.data)
-            if(menuRes.data.modifiedCount > 0){
-                // show success popup
-                // reset();
+            if (menuRes.data.modifiedCount > 0) {
                 Swal.fire({
                     position: "top-end",
                     icon: "success",
-                    title: `${data.name} is updated to the menu.`,
+                    title: `${data.name} has been updated successfully!`,
                     showConfirmButton: false,
                     timer: 1500
-                  });
+                });
             }
         }
-        console.log( 'with image url', res.data);
     };
-    
-    
+
     return (
-        <div>
-            <SectionTitle heading="Update an Item" subHeading="Refresh info"></SectionTitle>
-            <div>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="form-control w-full my-6">
-                        <label className="label">
-                            <span className="label-text">Recipe Name*</span>
-                        </label>
+        <motion.div
+            className="max-w-3xl mx-auto p-6 sm:p-10 bg-white shadow-xl rounded-2xl border border-gray-200 mt-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+        >
+            {/* Section Title */}
+            <motion.div
+                className="flex flex-col sm:flex-row justify-between items-center bg-gradient-to-r from-green-500 to-blue-500 text-white p-5 rounded-lg shadow-md mb-6"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+            >
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                    <FaUtensils />
+                    Update Item
+                </h2>
+                <p className="text-md italic">Refresh your menu details</p>
+            </motion.div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* Recipe Name */}
+                <motion.div
+                    className="form-control"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <label className="label font-semibold">Recipe Name*</label>
+                    <input
+                        type="text"
+                        defaultValue={name}
+                        placeholder="Recipe Name"
+                        {...register("name", { required: true })}
+                        className="input input-bordered w-full"
+                    />
+                </motion.div>
+
+                {/* Category & Price */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {/* Category */}
+                    <motion.div
+                        className="form-control"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                    >
+                        <label className="label font-semibold">Category*</label>
+                        <select
+                            defaultValue={category}
+                            {...register("category", { required: true })}
+                            className="select select-bordered w-full"
+                        >
+                            <option disabled value="default">
+                                Select a category
+                            </option>
+                            <option value="salad">Salad</option>
+                            <option value="pizza">Pizza</option>
+                            <option value="soup">Soup</option>
+                            <option value="dessert">Dessert</option>
+                            <option value="drinks">Drinks</option>
+                        </select>
+                    </motion.div>
+
+                    {/* Price */}
+                    <motion.div
+                        className="form-control"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                    >
+                        <label className="label font-semibold">Price*</label>
                         <input
-                            type="text"
-                            defaultValue={name}
-                            placeholder="Recipe Name"
-                            {...register('name', { required: true })}
-                            required
-                            className="input input-bordered w-full" />
-                    </div>
-                    <div className="flex gap-6">
-                        {/* category */}
-                        <div className="form-control w-full my-6">
-                            <label className="label">
-                                <span className="label-text">Category*</span>
-                            </label>
-                            <select defaultValue={category} {...register('category', { required: true })}
-                                className="select select-bordered w-full">
-                                <option disabled value="default">Select a category</option>
-                                <option value="salad">Salad</option>
-                                <option value="pizza">Pizza</option>
-                                <option value="soup">Soup</option>
-                                <option value="dessert">Dessert</option>
-                                <option value="drinks">Drinks</option>
-                            </select>
-                        </div>
+                            type="number"
+                            defaultValue={price}
+                            placeholder="Price"
+                            {...register("price", { required: true })}
+                            className="input input-bordered w-full"
+                        />
+                    </motion.div>
+                </div>
 
-                        {/* price */}
-                        <div className="form-control w-full my-6">
-                            <label className="label">
-                                <span className="label-text">Price*</span>
-                            </label>
-                            <input
-                                type="number"
-                                defaultValue={price}
-                                placeholder="Price"
-                                {...register('price', { required: true })}
-                                className="input input-bordered w-full" />
-                        </div>
+                {/* Recipe Details */}
+                <motion.div
+                    className="form-control"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                >
+                    <label className="label font-semibold">Recipe Details</label>
+                    <textarea
+                        defaultValue={recipe}
+                        {...register("recipe")}
+                        className="textarea textarea-bordered h-24"
+                        placeholder="Describe the recipe..."
+                    />
+                </motion.div>
 
+                {/* File Upload */}
+                <motion.div
+                    className="form-control"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                    <label className="label font-semibold">Upload Image*</label>
+                    <div className="relative w-full max-w-xs">
+                        <input
+                            {...register("image", { required: true })}
+                            type="file"
+                            className="file-input file-input-bordered w-full"
+                        />
+                        <FaUpload className="absolute right-4 top-4 text-gray-500" />
                     </div>
-                    {/* recipe details */}
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text">Recipe Details</span>
-                        </label>
-                        <textarea defaultValue={recipe} {...register('recipe')} className="textarea textarea-bordered h-24" placeholder="Bio"></textarea>
-                    </div>
+                </motion.div>
 
-                    <div className="form-control w-full my-6">
-                        <input {...register('image', { required: true })} type="file" className="file-input w-full max-w-xs" />
-                    </div>
-
-                    <button className="btn">
-                        Update menu Item
-                    </button>
-                </form>
-            </div>
-        </div>
+                {/* Submit Button */}
+                <motion.button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-300"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                >
+                    <FaSave />
+                    Update Menu Item
+                </motion.button>
+            </form>
+        </motion.div>
     );
 };
 
